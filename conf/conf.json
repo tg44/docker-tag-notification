@@ -1,0 +1,8 @@
+{
+    "repos": [
+        {
+            "name": "alpine",
+            "tag": "latest"
+        }
+    ]
+}
