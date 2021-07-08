@@ -8,7 +8,7 @@ const docker = require('docker-registry-client')
 
 const isVerbose = process.env.IS_VERBOSE || false
 const discordUrl = process.env.DISCORD
-const cron = process.env.CRON_EXPRESSION || '21 2,32 * * * *'
+const cron = process.env.CRON_EXPRESSION || '21 14,44 * * * *'
 const timeZone = process.env.CRON_TIMEZONE || 'Europe/Budapest'
 
 const rawdata = fs.readFileSync('conf/conf.json')
@@ -41,9 +41,11 @@ async function checkOne(name, tag) {
   const client = docker.createClientV2({name})
   const newM = await getManifest(client, tag)
 
+  const nameNormalized = name.replaceAll('/', '-')
+
   let oldM = {}
   try{
-    oldM = JSON.parse(await fsa.readFile(`conf/${name}-${tag}.json`))
+    oldM = JSON.parse(await fsa.readFile(`conf/${nameNormalized}-${tag}.json`))
   } catch {}
   oldM.signatures = null
   newM.signatures = null
@@ -51,7 +53,7 @@ async function checkOne(name, tag) {
     return
   } else {
     await notify([{title: "New docker version alert!", description: `${name}:${tag} is updated!`}])
-    await fsa.writeFile(`conf/${name}-${tag}.json`,JSON.stringify(newM))
+    await fsa.writeFile(`conf/${nameNormalized}-${tag}.json`,JSON.stringify(newM))
   }
 }
 
