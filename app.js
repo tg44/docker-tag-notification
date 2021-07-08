@@ -41,11 +41,11 @@ async function checkOne(name, tag) {
   const client = docker.createClientV2({name})
   const newM = await getManifest(client, tag)
 
-  const nameNormalized = name.replaceAll('/', '-')
+  const fileName = `conf/${name.split('/').join('-')}-${tag}.json`
 
   let oldM = {}
   try{
-    oldM = JSON.parse(await fsa.readFile(`conf/${nameNormalized}-${tag}.json`))
+    oldM = JSON.parse(await fsa.readFile(fileName))
   } catch {}
   oldM.signatures = null
   newM.signatures = null
@@ -53,7 +53,7 @@ async function checkOne(name, tag) {
     return
   } else {
     await notify([{title: "New docker version alert!", description: `${name}:${tag} is updated!`}])
-    await fsa.writeFile(`conf/${nameNormalized}-${tag}.json`,JSON.stringify(newM))
+    await fsa.writeFile(fileName,JSON.stringify(newM))
   }
 }
 
